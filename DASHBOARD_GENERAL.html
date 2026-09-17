@@ -1040,6 +1040,12 @@
             var rows = parsePropertyTab(csvText, sheet.estacion);
             if (rows.length && rows[0].propName){
               SHEET_PROP_MAP[rows[0].propName] = {id: sheet.id, estacion: sheet.estacion};
+            } else {
+              var csvRows = parseCsv(csvText);
+              var pText = cleanWs((csvRows[2] && csvRows[2][3]) || "").toUpperCase();
+              if (pText && pText.length <= 40 && !SHEET_PROP_MAP[pText]){
+                SHEET_PROP_MAP[pText] = {id: sheet.id, estacion: sheet.estacion};
+              }
             }
             return rows;
           }).catch(function(){
@@ -1124,7 +1130,11 @@
   var ESTACIONES_FIJAS = ["ESTACION 1","ESTACION 2","ESTACION 3","ESTACION 4","ESTACION 5","ESTACION 6","ESTACION 7","ESTACION 8","ESTACION GPS"];
   function propsForSector(sector){
     var pool = sector ? DATA.filter(function(d){return d.estacion===sector;}) : DATA;
-    return uniqueSorted(pool.map(function(d){return d.prop;}));
+    var fromData = pool.map(function(d){return d.prop;});
+    var known = Object.keys(SHEET_PROP_MAP).filter(function(p){
+      return !sector || SHEET_PROP_MAP[p].estacion === sector;
+    });
+    return uniqueSorted(fromData.concat(known));
   }
   function updatePropOptionsForSector(sectorSelectEl, propSelectEl){
     var prev = propSelectEl.value;
