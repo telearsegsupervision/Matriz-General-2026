@@ -557,7 +557,7 @@
 
       <div class="source-line">
         <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
-        Datos en vivo desde Google Sheets (hojas por propiedad, Estación 1 a 7) · se actualiza automáticamente cada 3 minutos · <a href="javascript:void(0)" id="btnRefreshNow">actualizar ahora</a>
+        Datos en vivo desde Google Sheets (hojas por propiedad, Estación 1 a 7) · se actualiza automáticamente cada 3 minutos · <a href="javascript:void(0)" id="btnRefreshNow">actualizar ahora</a><span id="sheetLinks"></span>
       </div>
 
       <div class="filters">
@@ -1025,6 +1025,7 @@
     }).catch(function(){ return ""; });
   }
 
+  var SHEET_PROP_MAP = {};
   function loadLiveData(onProgress){
     var jobs = [];
     var total = 0, done = 0;
@@ -1036,7 +1037,11 @@
           fetchTabCsv(sheet.id, gid).then(function(csvText){
             done++; if (onProgress) onProgress(done, total);
             if (!csvText) return [];
-            return parsePropertyTab(csvText, sheet.estacion);
+            var rows = parsePropertyTab(csvText, sheet.estacion);
+            if (rows.length && rows[0].propName){
+              SHEET_PROP_MAP[rows[0].propName] = {id: sheet.id, estacion: sheet.estacion};
+            }
+            return rows;
           }).catch(function(){
             done++; if (onProgress) onProgress(done, total);
             return [];
@@ -1127,6 +1132,19 @@
     var stillValid = Array.prototype.some.call(propSelectEl.options, function(o){ return o.value === prev; });
     propSelectEl.value = stillValid ? prev : "";
   }
+  function titleCaseLink(s){ return titleCase(s); }
+  function renderSheetLinks(sector){
+    var el = document.getElementById("sheetLinks");
+    if (!el) return;
+    var props = propsForSector(sector);
+    var html = "";
+    props.forEach(function(p){
+      var info = SHEET_PROP_MAP[p];
+      if (!info) return;
+      html += ' · <a href="https://docs.google.com/spreadsheets/d/' + info.id + '/edit?usp=sharing" target="_blank" rel="noopener">ver hoja ' + titleCaseLink(p) + '</a>';
+    });
+    el.innerHTML = html;
+  }
   function opsForSector(sector){
     var pool = sector ? DATA.filter(function(d){return d.estacion===sector;}) : DATA;
     return uniqueSorted(pool.map(function(d){return d.op;}));
@@ -1144,6 +1162,7 @@
     fillSelect(els.fNivel, NIVEL_ORDER.filter(function(n){ return DATA.some(function(d){return d.nivel===n;}); }), "Todos los niveles");
     fillSelect(els.fEst, ESTACIONES_FIJAS, "Todas las estaciones");
     fillSelect(els.fOperador, opsForSector(els.fEst.value), "Todos los operadores");
+    renderSheetLinks(els.fEst.value);
     var rEstEl = document.getElementById("rEst");
     if (rEstEl){
       fillSelect(rEstEl, ESTACIONES_FIJAS, "Todas las estaciones");
@@ -1453,12 +1472,13 @@
   }
 
   [els.fProp, els.fTipo, els.fNivel, els.fOperador, els.fFecha].forEach(function(s){ s.addEventListener("change", render); });
-  els.fEst.addEventListener("change", function(){ updatePropOptionsForSector(els.fEst, els.fProp); updateOpOptionsForSector(els.fEst, els.fOperador); render(); });
+  els.fEst.addEventListener("change", function(){ updatePropOptionsForSector(els.fEst, els.fProp); updateOpOptionsForSector(els.fEst, els.fOperador); renderSheetLinks(els.fEst.value); render(); });
   els.fSearch.addEventListener("input", render);
   els.btnClear.addEventListener("click", function(){
     els.fEst.value = ""; els.fProp.value = ""; els.fTipo.value = ""; els.fNivel.value = ""; els.fOperador.value = ""; els.fFecha.value = ""; els.fSearch.value = "";
     updatePropOptionsForSector(els.fEst, els.fProp);
     updateOpOptionsForSector(els.fEst, els.fOperador);
+    renderSheetLinks(els.fEst.value);
     render();
   });
   els.btnMore.addEventListener("click", function(){
