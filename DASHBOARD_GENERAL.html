@@ -566,7 +566,7 @@
           <select id="fEst"></select>
         </div>
         <div class="field">
-          <label for="fProp">Camaronera / Propiedad</label>
+          <label for="fProp">Propiedad</label>
           <select id="fProp"></select>
         </div>
         <div class="field">
@@ -661,7 +661,7 @@
           <select id="rEst"></select>
         </div>
         <div class="field">
-          <label for="rProp">Camaronera / Propiedad</label>
+          <label for="rProp">Propiedad</label>
           <select id="rProp"></select>
         </div>
         <div class="field">
@@ -977,7 +977,7 @@
 
     // Variantes de columnas: algunas hojas no tienen "PISCINA" (Ceibos) o
     // agregan una columna "CATEGORIA" extra entre TIPO y DESCRIPCION (Impala).
-    var noPiscina = /CEIBOS|DURANCOCOA/.test(propText);
+    var noPiscina = /CEIBOS|DURANCOCOA|CAMPAMENTO VICTORIA/.test(propText);
     var extraCategoria = /IMPALA/.test(propText);
 
     var out = [];
@@ -1056,7 +1056,7 @@
     DATA = RAW.map(function(r){
       return {
         n: r.n, estacion: r.estacion, fecha: r.dia, hora: r.hora,
-        prop: r.camaronera, cliente: clienteDe(r.propName || r.camaronera), perim: r.perimetro, nt: r.nt, tipo: r.tipo,
+        prop: r.propName || r.camaronera, cliente: clienteDe(r.propName || r.camaronera), perim: r.perimetro, nt: r.nt, tipo: r.tipo,
         desc: r.descripcion, inv: r.involucrado, nivel: r.nivel,
         op: r.operador, accion: r.accion
       };
@@ -1127,20 +1127,30 @@
     var stillValid = Array.prototype.some.call(propSelectEl.options, function(o){ return o.value === prev; });
     propSelectEl.value = stillValid ? prev : "";
   }
+  function opsForSector(sector){
+    var pool = sector ? DATA.filter(function(d){return d.estacion===sector;}) : DATA;
+    return uniqueSorted(pool.map(function(d){return d.op;}));
+  }
+  function updateOpOptionsForSector(sectorSelectEl, opSelectEl){
+    var prev = opSelectEl.value;
+    fillSelect(opSelectEl, opsForSector(sectorSelectEl.value), "Todos los operadores");
+    var stillValid = Array.prototype.some.call(opSelectEl.options, function(o){ return o.value === prev; });
+    opSelectEl.value = stillValid ? prev : "";
+  }
   function populateFilters(){
     estaciones = uniqueSorted(DATA.map(function(d){return d.estacion;}));
     fillSelect(els.fProp, propsForSector(els.fEst.value), "Todas las propiedades");
     fillSelect(els.fTipo, uniqueSorted(DATA.map(function(d){return d.tipo;})), "Todos los tipos");
     fillSelect(els.fNivel, NIVEL_ORDER.filter(function(n){ return DATA.some(function(d){return d.nivel===n;}); }), "Todos los niveles");
     fillSelect(els.fEst, ESTACIONES_FIJAS, "Todas las estaciones");
-    fillSelect(els.fOperador, uniqueSorted(DATA.map(function(d){return d.op;})), "Todos los operadores");
+    fillSelect(els.fOperador, opsForSector(els.fEst.value), "Todos los operadores");
     var rEstEl = document.getElementById("rEst");
     if (rEstEl){
       fillSelect(rEstEl, ESTACIONES_FIJAS, "Todas las estaciones");
       fillSelect(document.getElementById("rProp"), propsForSector(rEstEl.value), "Todas las propiedades");
       fillSelect(document.getElementById("rTipo"), uniqueSorted(DATA.map(function(d){return d.tipo;})), "Todos los tipos");
       fillSelect(document.getElementById("rNivel"), NIVEL_ORDER.filter(function(n){ return DATA.some(function(d){return d.nivel===n;}); }), "Todos los niveles");
-      fillSelect(document.getElementById("rOperador"), uniqueSorted(DATA.map(function(d){return d.op;})), "Todos los operadores");
+      fillSelect(document.getElementById("rOperador"), opsForSector(rEstEl.value), "Todos los operadores");
     }
   }
   populateFilters();
@@ -1443,11 +1453,12 @@
   }
 
   [els.fProp, els.fTipo, els.fNivel, els.fOperador, els.fFecha].forEach(function(s){ s.addEventListener("change", render); });
-  els.fEst.addEventListener("change", function(){ updatePropOptionsForSector(els.fEst, els.fProp); render(); });
+  els.fEst.addEventListener("change", function(){ updatePropOptionsForSector(els.fEst, els.fProp); updateOpOptionsForSector(els.fEst, els.fOperador); render(); });
   els.fSearch.addEventListener("input", render);
   els.btnClear.addEventListener("click", function(){
     els.fEst.value = ""; els.fProp.value = ""; els.fTipo.value = ""; els.fNivel.value = ""; els.fOperador.value = ""; els.fFecha.value = ""; els.fSearch.value = "";
     updatePropOptionsForSector(els.fEst, els.fProp);
+    updateOpOptionsForSector(els.fEst, els.fOperador);
     render();
   });
   els.btnMore.addEventListener("click", function(){
@@ -1493,6 +1504,7 @@
     });
     document.getElementById("rEst").addEventListener("change", function(){
       updatePropOptionsForSector(document.getElementById("rEst"), document.getElementById("rProp"));
+      updateOpOptionsForSector(document.getElementById("rEst"), document.getElementById("rOperador"));
       rShown = PAGE_SIZE; renderRegistro();
     });
     document.getElementById("rSearch").addEventListener("input", function(){ rShown = PAGE_SIZE; renderRegistro(); });
@@ -1500,6 +1512,7 @@
       ["rEst","rProp","rTipo","rNivel","rOperador","rFecha"].forEach(function(id){ document.getElementById(id).value = ""; });
       document.getElementById("rSearch").value = "";
       updatePropOptionsForSector(document.getElementById("rEst"), document.getElementById("rProp"));
+      updateOpOptionsForSector(document.getElementById("rEst"), document.getElementById("rOperador"));
       rShown = PAGE_SIZE;
       renderRegistro();
     });
