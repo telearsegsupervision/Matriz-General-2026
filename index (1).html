@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeleArseg · Portal de Accesos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#030814;
+    --navy-900:#0a1633;
+    --navy-800:#0f2140;
+    --navy-700:#152c52;
+    --cyan:#00d4ff;
+    --teal:#00e6c3;
+    --blue-accent:#00d4ff;
+    --blue-accent-soft:rgba(0,212,255,.14);
+    --bg:#05091a;
+    --surface:#0f1a2e;
+    --surface-2:#0b1526;
+    --border:#1e2d4a;
+    --text:#eaf2fb;
+    --text-muted:#93a4c4;
+    --text-faint:#5f7292;
+    --crit:#ff4d5e;
+    --crit-soft:rgba(255,77,94,.16);
+    --ok:#22d38a;
+    --shadow-card:0 1px 2px rgba(0,0,0,.35), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;min-height:100%;}
+  h1,h2,h3,.brand-word{font-family:"Manrope",system-ui,sans-serif;}
+  a{color:inherit;}
+
+  /* ===== topbar ===== */
+  .topbar{
+    display:flex;align-items:center;gap:18px;padding:18px 28px;background:linear-gradient(180deg,var(--navy-900),var(--bg));
+    border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-logo{width:150px;height:auto;display:block;}
+  .brand-sep{width:1px;height:34px;background:var(--border);margin:0 2px;}
+  .brand-titles h1{font-size:18px;font-weight:800;margin:0;letter-spacing:.02em;line-height:1.2;}
+  .brand-titles p{font-size:10.5px;color:var(--text-muted);margin:2px 0 0;letter-spacing:.14em;text-transform:uppercase;}
+  .topbar-search{margin-left:auto;display:flex;align-items:center;gap:10px;flex:1 1 320px;max-width:420px;}
+  .search-box{
+    display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:11px;
+    padding:10px 14px;width:100%;
+  }
+  .search-box svg{color:var(--text-faint);flex-shrink:0;}
+  .search-box input{
+    background:none;border:none;outline:none;color:var(--text);font-family:inherit;font-size:13px;width:100%;
+  }
+  .search-box input::placeholder{color:var(--text-faint);}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:30px 28px 60px;}
+
+  /* ===== featured emergency card ===== */
+  .featured{
+    display:flex;align-items:center;gap:20px;background:linear-gradient(120deg,rgba(255,77,94,.14),rgba(255,77,94,.04));
+    border:1px solid rgba(255,77,94,.4);border-radius:16px;padding:22px 26px;margin-bottom:34px;
+    box-shadow:var(--shadow-card);
+  }
+  .featured-ico{
+    width:54px;height:54px;border-radius:14px;background:rgba(255,77,94,.18);border:1px solid rgba(255,77,94,.5);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--crit);
+  }
+  .featured-body{flex:1;min-width:0;}
+  .featured-eyebrow{font-size:9.5px;color:var(--crit);text-transform:uppercase;letter-spacing:.14em;font-weight:700;margin-bottom:4px;}
+  .featured h2{font-size:19px;margin:0 0 4px;}
+  .featured p{font-size:12.5px;color:var(--text-muted);margin:0;}
+  .featured-btn{
+    flex-shrink:0;display:flex;align-items:center;gap:8px;background:linear-gradient(120deg,var(--crit),#ff7a65);
+    color:#1a0608;font-weight:800;font-size:13px;padding:12px 20px;border-radius:11px;text-decoration:none;
+    white-space:nowrap;box-shadow:0 8px 20px -6px rgba(255,77,94,.55);
+  }
+  .featured-btn:hover{filter:brightness(1.06);}
+
+  /* ===== section headers ===== */
+  .section{margin-bottom:38px;}
+  .section-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .section-head h2{font-size:15px;margin:0;letter-spacing:.03em;}
+  .section-head .count{font-size:11px;color:var(--text-faint);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px;}
+  .section-sub{font-size:11.5px;color:var(--text-muted);margin:-10px 0 16px;}
+
+  /* ===== cards grid ===== */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
+  .card{
+    display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:16px;box-shadow:var(--shadow-card);transition:border-color .14s ease,transform .14s ease;
+  }
+  .card:hover{border-color:var(--blue-accent);transform:translateY(-2px);}
+  .card-top{display:flex;align-items:center;gap:11px;}
+  .card-avatar{
+    width:40px;height:40px;border-radius:10px;background:var(--blue-accent-soft);color:var(--cyan);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;letter-spacing:.02em;
+  }
+  .card-name{font-size:13px;font-weight:700;line-height:1.3;}
+  .card-desc{font-size:10.5px;color:var(--text-faint);line-height:1.5;flex:1;}
+  .card-btn{
+    display:flex;align-items:center;justify-content:center;gap:7px;background:var(--surface-2);border:1px solid var(--border);
+    color:var(--text);font-weight:700;font-size:11.5px;padding:9px;border-radius:9px;text-decoration:none;margin-top:2px;
+  }
+  .card-btn:hover{border-color:var(--blue-accent);color:var(--cyan);}
+  .card-btn svg{flex-shrink:0;}
+
+  /* panel-1 hero card (single entry, bigger) */
+  .hero-card{
+    display:flex;align-items:center;gap:20px;background:linear-gradient(120deg,rgba(0,212,255,.1),rgba(0,230,195,.04));
+    border:1px solid rgba(0,212,255,.35);border-radius:16px;padding:22px 26px;box-shadow:var(--shadow-card);
+  }
+  .hero-ico{
+    width:54px;height:54px;border-radius:14px;background:var(--blue-accent-soft);border:1px solid rgba(0,212,255,.5);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--cyan);
+  }
+  .hero-card h3{font-size:17px;margin:0 0 4px;}
+  .hero-card p{font-size:12px;color:var(--text-muted);margin:0;}
+  .hero-btn{
+    flex-shrink:0;display:flex;align-items:center;gap:8px;background:linear-gradient(120deg,var(--cyan),var(--teal));
+    color:#02121a;font-weight:800;font-size:13px;padding:12px 20px;border-radius:11px;text-decoration:none;white-space:nowrap;
+  }
+  .hero-btn:hover{filter:brightness(1.06);}
+
+  .empty-state{padding:40px 10px;text-align:center;color:var(--text-faint);font-size:12.5px;display:none;}
+
+  footer{text-align:center;padding:24px 0 10px;color:var(--text-faint);font-size:10.5px;}
+
+  @media (max-width:640px){
+    .topbar{padding:14px 16px;}
+    .brand-logo{width:120px;}
+    .wrap{padding:22px 16px 40px;}
+    .featured,.hero-card{flex-direction:column;align-items:flex-start;}
+    .featured-btn,.hero-btn{width:100%;justify-content:center;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img class="brand-logo" alt="TeleArseg" src="data:image/png;base64,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">
+  </div>
+  <div class="brand-sep"></div>
+  <div class="brand-titles">
+    <h1>Portal de Accesos</h1>
+    <p>Centro de operaciones · Dashboards</p>
+  </div>
+  <div class="topbar-search">
+    <div class="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="searchInput" type="text" placeholder="Buscar cliente o estación...">
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===== Protocolo de Emergencia ===== -->
+  <a class="featured" id="emergencyCard" href="#" target="_blank" rel="noopener" style="text-decoration:none;">
+    <div class="featured-ico">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+    </div>
+    <div class="featured-body">
+      <div class="featured-eyebrow">Acceso directo</div>
+      <h2>Protocolo de Emergencia</h2>
+      <p>Procedimientos, mapeo y contactos para responder ante una novedad en cualquier estación.</p>
+    </div>
+    <span class="featured-btn">
+      Ingresar
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+    </span>
+  </a>
+
+  <!-- ===== Panel 1 — Dashboard General de Estaciones ===== -->
+  <div class="section" id="panel1Section">
+    <div class="section-head">
+      <h2>📊 Dashboard General de Estaciones</h2>
+    </div>
+    <p class="section-sub">Vista consolidada de incidentes de todas las estaciones, con filtro propio por estación.</p>
+    <a class="hero-card" id="generalCard" href="#" target="_blank" rel="noopener" style="text-decoration:none;">
+      <div class="hero-ico">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-3-3-4 4"/></svg>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <h3 id="generalCardTitle">Matriz General</h3>
+        <p>Incidentes, estadísticas y hojas de cálculo por propiedad de todas las estaciones.</p>
+      </div>
+      <span class="hero-btn">
+        Abrir Dashboard
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+      </span>
+    </a>
+  </div>
+
+  <!-- ===== Panel 2 — Dashboard por Cliente ===== -->
+  <div class="section" id="panel2Section">
+    <div class="section-head">
+      <h2>🏢 Dashboard por Cliente</h2>
+      <span class="count" id="clientCount">0 clientes</span>
+    </div>
+    <p class="section-sub">Dashboard individual de cada cliente — el mismo link que se envía al cierre de mes.</p>
+    <div class="grid" id="clientGrid"></div>
+    <div class="empty-state" id="emptyState">Sin resultados para esa búsqueda.</div>
+  </div>
+
+</div>
+
+<footer>TeleArseg © Portal de Accesos · Seguridad, Monitoreo y Videovigilancia</footer>
+
+<script>
+var EMERGENCY = { nombre: 'PLAN DE EMERGENCIA', link: 'https://telearsegsupervision.github.io/Protocolo-de-Emergencias-2026/plan-emergencia-2026.html' };
+var GENERAL = { nombre: 'MATRIZ GENERAL', link: 'https://telearsegsupervision.github.io/Matriz-General-2026/DASHBOARD_GENERAL.html' };
+
+var CLIENTES = [
+  { nombre:'EXPALSA', link:'https://telearsegsupervision.github.io/Panel-TeleArseg---Expalsa-/EXPALSA.html' },
+  { nombre:'GRUPO VASCO', link:'https://telearsegsupervision.github.io/GRUPO-VASCO---DASHBOARD/GRUPOVASCO.html' },
+  { nombre:'OMARSA', link:'https://telearsegsupervision.github.io/OMARSA---DASHBOARD/OMARSA.html' },
+  { nombre:'HCDAS LANEC COSTA', link:'https://telearsegsupervision.github.io/HACIENDAS-LANEC/HACIENDASLANEC.html' },
+  { nombre:'LANEC TAURA', link:'https://telearsegsupervision.github.io/LANEC-TAURA---CAMARONERAS/LANECTAURA.html' },
+  { nombre:'GARITAS LANEC', link:'https://telearsegsupervision.github.io/GARITAS-LANEC-COSTA/GARITASLANECCOSTA.html' },
+  { nombre:'PACIFICAM TAURA', link:'https://telearsegsupervision.github.io/Panel-TeleArseg---Pacificam-Taura/pacifican.html' },
+  { nombre:'LUKMAR', link:'https://telearsegsupervision.github.io/LUKMAR---DASHBOARD/LUKMAR.html' },
+  { nombre:'ING. FARAH', link:'https://telearsegsupervision.github.io/CLIENTE---ING.-XAVIER-FARAH/XAVIERFARAH.html' },
+  { nombre:'ING. DIEGO GALLARDO', link:'https://telearsegsupervision.github.io/ING.-DIEGO-GALLARDO---DASHBOARD/DIEGOGALLARDO.html' },
+  { nombre:'ING. ALEJANDRO CRUZ', link:'https://telearsegsupervision.github.io/ING.-ALEJANDRO-CRUZ---DASHBOARD/ALEJANDROCRUZ.html' },
+  { nombre:'DRA. ANA BRITO', link:'https://telearsegsupervision.github.io/DR.-ANA-BRITO---DASHBOARD/ANABRITO.html' },
+  { nombre:'ING. SEUNG YEO', link:'https://telearsegsupervision.github.io/ING.-SEUNG-YEO---DASHBOARD/SEUNGYEO.html' },
+  { nombre:'ING. MARCOS CASTILLO', link:'https://telearsegsupervision.github.io/M.C.L---Dashboard/M.C.L.html' },
+  { nombre:'CULSARO', link:'https://telearsegsupervision.github.io/Culsaro---Dashboard/CULSARO.html' },
+  { nombre:'CORPORACION ARAY', link:'https://telearsegsupervision.github.io/Corporacion-Aray---Dashboard/CORPORACION%20ARAY.html' },
+  { nombre:'HOTEL WYNDHAM MANTA SAIL PLAZA', link:'https://telearsegsupervision.github.io/HOTEL-WYNDHAM---DASHBOARD/WYNDHAM.html' },
+  { nombre:'CEIBOS', link:'https://telearsegsupervision.github.io/CEIBOS---DASHBOARD/CEIBOS.html' },
+  { nombre:'IMPALA TERMINALS', link:'https://telearsegsupervision.github.io/IMPALA-TERMINALS---DASHBOARD/IMPALA.html' },
+  { nombre:'DIMASS', link:'https://telearsegsupervision.github.io/DIMASS---DASHBOARD/DIMAS.html' },
+  { nombre:'GRUPO SANTOS', link:'https://telearsegsupervision.github.io/GRUPO-SANTOS---DASHBOARD/GRUPO_SANTOS.html' },
+  { nombre:'TUMBES PA', link:'https://telearsegsupervision.github.io/TUMBES-PA---DASHBOARD/TUMBES_PA.html' },
+  { nombre:'CANAL DE GUAYAQUIL', link:'https://telearsegsupervision.github.io/CANAL-DE-GUAYAQUIL---DASHBOARD/CANAL_DE_GUAYAQUIL.html' },
+  { nombre:'PESCASOL', link:'https://telearsegsupervision.github.io/PESCASOL---DASHBOARD/PESCASOL.html' },
+  { nombre:'VITABAL S.A', link:'https://telearsegsupervision.github.io/Vitabal-S.A---Dashboard/VITABAL.html' },
+  { nombre:'CRISOMAR', link:'https://telearsegsupervision.github.io/Crisomar---Dashboard/CRISOMAR.html' },
+  { nombre:'GRUPO CACESA', link:'https://telearsegsupervision.github.io/GRUPO-CACESA---HONDURAS/GRUPO_CACESA.html' },
+  { nombre:'BIOMAR CAMARAS', link:'https://telearsegsupervision.github.io/BIOMAR---DASHBOARD/BIOMAR.html' },
+  { nombre:'LA ESMERALDA', link:'https://telearsegsupervision.github.io/Esmeralda---Dashboard/LA%20ESMERALDA.html' },
+  { nombre:'BIOMAR GPS', link:'https://telearsegsupervision.github.io/BIOMAR-GPS---DASHBOARD/BIOMAR_GPS.html' },
+  { nombre:'HACIENDA PALO SANTO', link:'https://telearsegsupervision.github.io/Hacienda-Palo-Santo---Dashboard/HACIENDA%20PALO%20SANTO.html' },
+  { nombre:'DURANCOCOA', link:'https://telearsegsupervision.github.io/Duran-Cocoa---Dashboard/DURANCOCOA.html' }
+];
+
+document.getElementById('emergencyCard').href = EMERGENCY.link;
+document.getElementById('generalCard').href = GENERAL.link;
+document.getElementById('generalCardTitle').textContent = GENERAL.nombre;
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, function(m){ return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]; });
+}
+function initials(name){
+  var words = name.replace(/^ING\.|^DRA\.|^LIC\./,'').trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return '??';
+  if (words.length === 1) return words[0].slice(0,2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+function norm(s){ return (s||'').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+
+var grid = document.getElementById('clientGrid');
+var emptyState = document.getElementById('emptyState');
+document.getElementById('clientCount').textContent = CLIENTES.length + (CLIENTES.length === 1 ? ' cliente' : ' clientes');
+
+function renderClients(filter){
+  var q = norm(filter);
+  var visible = 0;
+  grid.innerHTML = CLIENTES.map(function(c){
+    var match = !q || norm(c.nombre).indexOf(q) !== -1;
+    if (match) visible++;
+    return '<a class="card" href="'+c.link+'" target="_blank" rel="noopener" style="text-decoration:none;'+(match?'':'display:none;')+'" data-name="'+escapeHtml(norm(c.nombre))+'">' +
+      '<div class="card-top">' +
+        '<div class="card-avatar">'+initials(c.nombre)+'</div>' +
+        '<div class="card-name">'+escapeHtml(c.nombre)+'</div>' +
+      '</div>' +
+      '<div class="card-desc">Dashboard de monitoreo — incidentes, cámaras y reportes mensuales.</div>' +
+      '<span class="card-btn">' +
+        'Abrir Dashboard' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>' +
+      '</span>' +
+    '</a>';
+  }).join('');
+  emptyState.style.display = visible ? 'none' : 'block';
+}
+renderClients('');
+
+var searchInput = document.getElementById('searchInput');
+var panel1Section = document.getElementById('panel1Section');
+searchInput.addEventListener('input', function(){
+  var q = searchInput.value.trim();
+  renderClients(q);
+  var qn = norm(q);
+  var generalMatches = !qn || norm(GENERAL.nombre).indexOf(qn) !== -1 || norm('estacion').indexOf(qn) !== -1;
+  panel1Section.style.display = generalMatches ? '' : 'none';
+});
+</script>
+</body>
+</html>
